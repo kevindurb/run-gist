@@ -34,13 +34,13 @@ function loadFile(file) {
       loadHtmlToBody(file);
       break;
     default:
-      console.error(`Unknown file type: ${file.type}`);
+      console.log(`Unknown file type: ${file.type}`, file);
   }
 }
 
 function loadIntoElType(elType, file) {
   console.log(`loading ${file.filename}`);
-  fetchFileContents(file.raw_url)
+  fetchFileContents(file)
     .then(text => {
       const el = document.createElement(elType);
       el.innerHTML = text;
@@ -51,7 +51,7 @@ function loadIntoElType(elType, file) {
 
 function loadHtmlToBody(file) {
   console.log(`loading ${file.filename}`);
-  fetchFileContents(file.raw_url)
+  fetchFileContents(file)
     .then(text => {
       document.body.innerHTML += text;
       console.log(`${file.filename} appended to body`);
@@ -62,8 +62,6 @@ function fetchFileContents(file) {
   return fetch(file.raw_url)
     .then(response => response.text())
     .catch(err => {
-      console.error('Error loading file');
-      console.error(file);
-      console.error(err);
+      console.error('Error loading file', file, err);
     });
 }
