@@ -11,7 +11,11 @@ function loadGistFiles(id) {
   fetch(`https://api.github.com/gists/${id}`)
     .then(response => response.json())
     .then(gist => gist.files)
-    .catch(() => console.error('Error loading gist'))
+    .catch(err => {
+      console.error('Error loading gist');
+      console.error(id);
+      console.error(err);
+    })
     .then(files => {
       console.log('found gist... loading files...');
       Object.values(files).forEach(loadFile);
@@ -36,8 +40,7 @@ function loadFile(file) {
 
 function loadIntoElType(elType, file) {
   console.log(`loading ${file.filename}`);
-  fetch(file.raw_url)
-    .then(response => response.text())
+  fetchFileContents(file.raw_url)
     .then(text => {
       const el = document.createElement(elType);
       el.innerHTML = text;
@@ -48,10 +51,19 @@ function loadIntoElType(elType, file) {
 
 function loadHtmlToBody(file) {
   console.log(`loading ${file.filename}`);
-  fetch(file.raw_url)
-    .then(response => response.text())
+  fetchFileContents(file.raw_url)
     .then(text => {
       document.body.innerHTML += text;
       console.log(`${file.filename} appended to body`);
+    });
+}
+
+function fetchFileContents(file) {
+  return fetch(file.raw_url)
+    .then(response => response.text())
+    .catch(err => {
+      console.error('Error loading file');
+      console.error(file);
+      console.error(err);
     });
 }
